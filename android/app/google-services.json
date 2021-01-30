@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "857827055895",
+    "project_id": "allinone-e2d4b",
+    "storage_bucket": "allinone-e2d4b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:857827055895:android:cda4003e5703903925ff52",
+        "android_client_info": {
+          "package_name": "com.sk.all_in_one_shop"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "857827055895-srbv7t4io21colpicfn9ee532to2b2sn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCDrq_00ULTmbyv4yZFxa_o8VvGV8-uYSw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "857827055895-srbv7t4io21colpicfn9ee532to2b2sn.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
