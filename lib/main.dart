@@ -39,11 +39,11 @@ ErrorWidget.builder = (FlutterErrorDetails details) {
     if (inDebug){
             print("error ${details.exception}");
 
-       runApp(NotConnectedScreen(title: "You "));
+       runApp(NotConnectedScreen(title: "Opps! something went wrong! please try later", ));
 
     }else{
                 
-         runApp(NotConnectedScreen(title: "You "));
+         runApp(NotConnectedScreen(title: "Opps! something went wrong! please try later",));
 
     
     }

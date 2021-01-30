@@ -114,86 +114,76 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
 
     return StreamBuilder(
       stream: FirebaseDatabase.instance
-                            .reference()
-                            .child("Tabs")
-                            .child("tabdata")
-                            .once()
-                            .asStream(),
+          .reference()
+          .child("Tabs")
+          .child("tabdata")
+          .once()
+          .asStream(),
       builder: (context, snapshot) {
-                          if (snapshot.hasData) {
-                            Map<dynamic, dynamic> values = snapshot.data.value;
+        if (snapshot.hasData) {
+          Map<dynamic, dynamic> values = snapshot.data.value;
 
-                            values.forEach((key, value) {
-                              tablist.add(TabItem(
-                                  key: key.toString(),
-                                  title: value['title'],
-                                  iconCode: value['iconCode'],
-                                  iconFontFamily: value['iconFontFamily']));
-                                  });
+          values.forEach((key, value) {
+            tablist.add(TabItem(
+                key: key.toString(),
+                title: value['title'],
+                iconCode: value['iconCode'],
+                iconFontFamily: value['iconFontFamily']));
+          });
 
-        return Scaffold(
-          drawer: buildDrawer(tablist),
-          body: StreamBuilder(
-              stream: subscription,
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                
-                              return DefaultTabController(
-                                  length: tabController.length ?? 1,
-                                
-                                  child: NestedScrollView(
-                                    
-                                    headerSliverBuilder: (BuildContext context,
-                                        bool innerBoxIsScrolled) {
-                                      return <Widget>[
-                                        new SliverAppBar(
-                                          
-                                          pinned: true,
-                                          title: Text("All in one shop"),
-                                          bottom: TabBar(
-                                              controller: tabController,
-                                              isScrollable: true,
-                                              tabs: List.generate(tablist.length,
-                                                  (index) {
-                                                return Tab(
-                                                  text: tablist[index].title,
-                                                  icon: Icon(
-                                                    IconData(
-                                                        int.parse(tablist[index]
-                                                            .iconCode),
-                                                        fontFamily: tablist[index]
-                                                            .iconFontFamily),
-                                                  ),
-                                                );
-                                              })),
-                                        ),
-                                      ];
-                                    },
-                                    body: buildPages(tablist, db.reference(),
-                                        context, tablist.length)));
-                                    //),
-                                  
-                           
-                          } else {
-                            return NotConnectedScreen(
-                              title: "You are not connected to internet",
-                            );
-                          }
-                        }));
-                  
-                } else if (snapshot.hasError) {
-                  return Center(child: CircularProgressIndicator());
-                 
-                } else {
-                  return Center(child: CircularProgressIndicator());
-                }
+          return Scaffold(
+              drawer: buildDrawer(tablist),
+              body: StreamBuilder(
+                  stream: subscription,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      return DefaultTabController(
+                          length: tabController.length ?? 1,
+                          child: NestedScrollView(
+                              headerSliverBuilder: (BuildContext context,
+                                  bool innerBoxIsScrolled) {
+                                return <Widget>[
+                                  new SliverAppBar(
+                                    pinned: true,
+                                    title: Text("All in one shop"),
+                                    bottom: TabBar(
+                                        controller: tabController,
+                                        isScrollable: true,
+                                        tabs: List.generate(tablist.length,
+                                            (index) {
+                                          return Tab(
+                                              text: tablist[index].title,
+                                              icon: Icon(getIcon(
+                                                  tablist[index].iconCode)));
+                                        })),
+                                  ),
+                                ];
+                              },
+                              body: buildPages(tablist, db.reference(), context,
+                                  tablist.length)));
+                      //),
 
-                // });
-              },
-        );
-      }
-    
-  
+                    } else {
+                      return NotConnectedScreen(
+                        title: "You are not connected to internet",
+                      );
+                    }
+                  }));
+        } else if (snapshot.hasError) {
+          return Container(
+            color: Colors.white,
+            child: Center(child: CircularProgressIndicator()),
+          );
+        } else {
+          return Container(
+              color: Colors.white,
+              child: Center(child: CircularProgressIndicator()));
+        }
+
+        // });
+      },
+    );
+  }
 
   Widget buildPages(List<TabItem> tablist, DatabaseReference db,
       BuildContext context, int size) {
@@ -237,7 +227,6 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                   Container(
                     height: 300,
                     child: GridView.builder(
-                     
                       itemCount: shopitems.length,
                       itemBuilder: (c, index) {
                         return FlatButton(
@@ -245,10 +234,13 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                             //  tabController.animateTo(1);
                             //Navigate to the homeitem screen
 
-                            Navigator.of(context).push(MaterialPageRoute
-                            (builder: (c){
-                                return HomeItem(url:shopItems[index].link, title:shopItems[index].title);
-                            }), );
+                            Navigator.of(context).push(
+                              MaterialPageRoute(builder: (c) {
+                                return HomeItem(
+                                    url: shopItems[index].link,
+                                    title: shopItems[index].title);
+                              }),
+                            );
                           },
                           child: Column(children: [
                             SizedBox(
@@ -280,51 +272,47 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   Widget buildDrawer(List<TabItem> tablist) {
     var drawerKey = GlobalKey<DrawerControllerState>();
     return Drawer(
-      elevation: 8.0,
-      
-      key: drawerKey,
-      child: ListView(
-        padding: EdgeInsets.zero,
-              children: [
-                   DrawerHeader(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Text('All in one shop', style: TextStyle(fontSize: 18.0,color: Colors.white)),
-            Container(
-              margin: EdgeInsets.only(left:60),
-              child: Text(
-                
-                "v1",style: TextStyle(fontSize: 12.0 , color: Colors.white ), textAlign: TextAlign.right,),
-            )
-          ],
-        ),
-        decoration: BoxDecoration(
-          color: Colors.blue,
-        )),
-                
-                
-                Container(
-                height: 300,
-                child: ListView.builder(
-            // shrinkWrap: true,
-            // physics: ClampingScrollPhysics(),
-            itemCount: tablist.length,
-            itemBuilder: (c, index) {
-                return ListTile(
-                  onTap: () {
-                    tabController.animateTo(index);
-                    Navigator.of(context).pop();
-                  },
-                  leading: Icon(IconData(int.parse(tablist[index].iconCode),
-                      fontFamily: tablist[index].iconFontFamily)),
-                  title: Text(tablist[index].title),
-                );
-            }),
+        elevation: 8.0,
+        key: drawerKey,
+        child: ListView(padding: EdgeInsets.zero, children: [
+          DrawerHeader(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Text('All in one shop',
+                      style: TextStyle(fontSize: 18.0, color: Colors.white)),
+                  Container(
+                    margin: EdgeInsets.only(left: 60),
+                    child: Text(
+                      "v1",
+                      style: TextStyle(fontSize: 12.0, color: Colors.white),
+                      textAlign: TextAlign.right,
+                    ),
+                  )
+                ],
               ),
-              ]
-              
-    ));
+              decoration: BoxDecoration(
+                color: Colors.blue,
+              )),
+          Container(
+            height: 300,
+            child: ListView.builder(
+                // shrinkWrap: true,
+                // physics: ClampingScrollPhysics(),
+                itemCount: tablist.length,
+                itemBuilder: (c, index) {
+                  //  final icondata = int.parse(tablist[index].iconCode);
+                  return ListTile(
+                    onTap: () {
+                      tabController.animateTo(index);
+                      Navigator.of(context).pop();
+                    },
+                    leading: Icon(getIcon(tablist[index].iconCode)),
+                    title: Text(tablist[index].title),
+                  );
+                }),
+          ),
+        ]));
   }
 
   @override
@@ -383,10 +371,63 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                 itemCount: offerItems.length),
           );
         } else {
-          return Center(child: Text("Error occurred"));
+          return Center(child: Text("Loading offers"));
         }
       },
     );
   }
 
+  IconData getIcon(String iconCode) {
+    switch (iconCode) {
+      case "shop":
+        return const IconData(0xe9da, fontFamily: 'MaterialIcons');
+        break;
+      case "recharge":
+        return const IconData(0xe9f6, fontFamily: 'MaterialIcons');
+
+        break;
+      case "cake":
+        return const IconData(0xe018, fontFamily: 'MaterialIcons');
+
+        break;
+      case "mall":
+        return const IconData(0xed99, fontFamily: 'MaterialIcons');
+
+        break;
+
+      case "gift":
+        return const IconData(0xe0cc, fontFamily: 'MaterialIcons');
+
+        break;
+
+      case "travel":
+        return const IconData(0xe478, fontFamily: 'MaterialIcons');
+
+        break;
+
+      case "education":
+        return const IconData(0xe08e, fontFamily: 'MaterialIcons');
+
+        break;
+      case "travel_bus":
+        return const IconData(0xe13f, fontFamily: 'MaterialIcons');
+
+        break;
+
+      case "entertainment":
+        return const IconData(0xea9e, fontFamily: 'MaterialIcons');
+
+        break;
+      case "video":
+        return const IconData(0xe42a, fontFamily: 'MaterialIcons');
+
+        break;
+      case "news":
+        return const IconData(0xe189, fontFamily: 'MaterialIcons');
+
+        break;
+    }
+
+    return const IconData(0xe9da, fontFamily: 'MaterialIcons');
+  }
 }
