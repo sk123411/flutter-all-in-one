@@ -1,5 +1,6 @@
 import 'package:all_in_one_shop/provider/firebase_provider.dart';
 import 'package:all_in_one_shop/screens/home.dart';
+import 'package:all_in_one_shop/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:io' show Platform;
@@ -7,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:connectivity/connectivity.dart';
 import 'screens/no_connection.dart';
+import 'package:page_transition/page_transition.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -45,6 +47,7 @@ ErrorWidget.builder = (FlutterErrorDetails details) {
 
     
     }
+    return ErrorWidget(details.exception);
 };
     
     runApp(Builder(
@@ -71,7 +74,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         debugShowCheckedModeBanner: true,
         title: 'Flutter Demo',
-        home: StreamBuilder<Object>(
+        home: StreamBuilder(
             stream: checkConectivity().asStream().asBroadcastStream(),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
@@ -80,7 +83,7 @@ class MyApp extends StatelessWidget {
 
 
                 if (connection) {
-                  return Home();
+                  return SplashScreen();
                 } else {
                   return NotConnectedScreen(title:"You are not connected to internet",);
                 }

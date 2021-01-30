@@ -12,6 +12,8 @@ import 'package:flutter/services.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:all_in_one_shop/screens/no_connection.dart';
 
+import 'home_item.dart';
+
 class Home extends StatefulWidget {
   @override
   _HomeState createState() => _HomeState();
@@ -111,84 +113,87 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     final tablist = List<TabItem>();
 
     return StreamBuilder(
-        stream: subscription,
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            try {
-              return StreamBuilder(
-                  stream: FirebaseDatabase.instance
-                      .reference()
-                      .child("Tabs")
-                      .child("tabdata")
-                      .once()
-                      .asStream(),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      Map<dynamic, dynamic> values = snapshot.data.value;
+      stream: FirebaseDatabase.instance
+                            .reference()
+                            .child("Tabs")
+                            .child("tabdata")
+                            .once()
+                            .asStream(),
+      builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            Map<dynamic, dynamic> values = snapshot.data.value;
 
-                      values.forEach((key, value) {
-                        print(key.toString());
-                        tablist.add(TabItem(
-                            key: key.toString(),
-                            title: value['title'],
-                            iconCode: value['iconCode'],
-                            iconFontFamily: value['iconFontFamily']));
-                      });
-                      try {
-                        return DefaultTabController(
-                          length: tabController.length ?? 1,
-                          child: Scaffold(
-                            drawer: buildDrawer(tablist),
-                            appBar: AppBar(
-                              bottom: TabBar(
-                                  controller: tabController,
-                                  isScrollable: true,
-                                  tabs: List.generate(tablist.length, (index) {
-                                    return Tab(
-                                      text: tablist[index].title,
-                                      icon: Icon(
-                                        IconData(
-                                            int.parse(tablist[index].iconCode),
-                                            fontFamily:
-                                                tablist[index].iconFontFamily),
-                                      ),
-                                    );
-                                  })),
-                              title: Text("All in one shop"),
-                            ),
-                            body: buildPages(tablist, db.reference(), context,
-                                tablist.length),
-                          ),
-                        );
-                      } catch (e) {
-                        return NotConnectedScreen(
-                          title: "You are not connected to internet",
-                        );
-                      }
-                    } else {
-                      return NotConnectedScreen(
-                        title: "You are not connected to internet",
-                      );
-                    }
-                  });
-            } catch (e) {
-              return NotConnectedScreen(
-                title: "You are not connected to internet",
-              );
-            }
-          } else if (snapshot.hasError) {
-            return NotConnectedScreen(
-              title: "You are not connected to internet",
-            );
-          } else {
-            return NotConnectedScreen(
-              title: "You are not connected to internet",
-            );
-          }
+                            values.forEach((key, value) {
+                              tablist.add(TabItem(
+                                  key: key.toString(),
+                                  title: value['title'],
+                                  iconCode: value['iconCode'],
+                                  iconFontFamily: value['iconFontFamily']));
+                                  });
 
-          // });
-        });
-  }
+        return Scaffold(
+          drawer: buildDrawer(tablist),
+          body: StreamBuilder(
+              stream: subscription,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                
+                              return DefaultTabController(
+                                  length: tabController.length ?? 1,
+                                
+                                  child: NestedScrollView(
+                                    
+                                    headerSliverBuilder: (BuildContext context,
+                                        bool innerBoxIsScrolled) {
+                                      return <Widget>[
+                                        new SliverAppBar(
+                                          
+                                          pinned: true,
+                                          title: Text("All in one shop"),
+                                          bottom: TabBar(
+                                              controller: tabController,
+                                              isScrollable: true,
+                                              tabs: List.generate(tablist.length,
+                                                  (index) {
+                                                return Tab(
+                                                  text: tablist[index].title,
+                                                  icon: Icon(
+                                                    IconData(
+                                                        int.parse(tablist[index]
+                                                            .iconCode),
+                                                        fontFamily: tablist[index]
+                                                            .iconFontFamily),
+                                                  ),
+                                                );
+                                              })),
+                                        ),
+                                      ];
+                                    },
+                                    body: buildPages(tablist, db.reference(),
+                                        context, tablist.length)));
+                                    //),
+                                  
+                           
+                          } else {
+                            return NotConnectedScreen(
+                              title: "You are not connected to internet",
+                            );
+                          }
+                        }));
+                  
+                } else if (snapshot.hasError) {
+                  return Center(child: CircularProgressIndicator());
+                 
+                } else {
+                  return Center(child: CircularProgressIndicator());
+                }
+
+                // });
+              },
+        );
+      }
+    
+  
 
   Widget buildPages(List<TabItem> tablist, DatabaseReference db,
       BuildContext context, int size) {
@@ -230,8 +235,9 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
               child: Column(
                 children: [
                   Container(
-                    height: 400,
+                    height: 300,
                     child: GridView.builder(
+                     
                       itemCount: shopitems.length,
                       itemBuilder: (c, index) {
                         return FlatButton(
@@ -239,10 +245,10 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                             //  tabController.animateTo(1);
                             //Navigate to the homeitem screen
 
-                            // Navigator.of(context).push(MaterialPageRoute
-                            // (builder: (c){
-                            //     return HomeItem(url:shopItems[index].link, title:shopItems[index].title);
-                            // }), );
+                            Navigator.of(context).push(MaterialPageRoute
+                            (builder: (c){
+                                return HomeItem(url:shopItems[index].link, title:shopItems[index].title);
+                            }), );
                           },
                           child: Column(children: [
                             SizedBox(
@@ -259,127 +265,128 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                           crossAxisCount: 3),
                     ),
                   ),
-                          
-               
-               
-               
-                buildOfferPage() 
-                               
-                                
-                               
-                                ],
-                              ),
-                            );
-                          } else {
-                            return Center(
-                              child: Text("Loading"),
-                            );
-                          }
-                        });
-                  }
+                  buildOfferPage()
+                ],
+              ),
+            );
+          } else {
+            return Center(
+              child: Text("Loading"),
+            );
+          }
+        });
+  }
+
+  Widget buildDrawer(List<TabItem> tablist) {
+    var drawerKey = GlobalKey<DrawerControllerState>();
+    return Drawer(
+      elevation: 8.0,
+      
+      key: drawerKey,
+      child: ListView(
+        padding: EdgeInsets.zero,
+              children: [
+                   DrawerHeader(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Text('All in one shop', style: TextStyle(fontSize: 18.0,color: Colors.white)),
+            Container(
+              margin: EdgeInsets.only(left:60),
+              child: Text(
                 
-                  Widget buildDrawer(List<TabItem> tablist) {
-                    var drawerKey = GlobalKey<DrawerControllerState>();
-                    return Drawer(
-                      key: drawerKey,
-                      child: ListView.builder(
-                          itemCount: tablist.length,
-                          itemBuilder: (c, index) {
-                            return ListTile(
-                              onTap: () {
-                                tabController.animateTo(index);
-                                Navigator.of(context).pop();
-                              },
-                              leading: Icon(IconData(int.parse(tablist[index].iconCode),
-                                  fontFamily: tablist[index].iconFontFamily)),
-                              title: Text(tablist[index].title),
-                            );
-                          }),
-                    );
-                  }
+                "v1",style: TextStyle(fontSize: 12.0 , color: Colors.white ), textAlign: TextAlign.right,),
+            )
+          ],
+        ),
+        decoration: BoxDecoration(
+          color: Colors.blue,
+        )),
                 
-                  @override
-                  void dispose() {
-                    super.dispose();
-                    lengthcontroller.sink.close();
-                    tabController.dispose();
-                  }
                 
-                  void setTabController() {
-                    int test;
-                    FirebaseDatabase.instance
-                        .reference()
-                        .child("Tabs")
-                        .child("length")
-                        .once()
-                        .then((value) {
-                      test = value.value;
-                      lengthcontroller.sink.add(test);
-                    });
-                  }
-                
-                  Widget buildOfferPage() {
+                Container(
+                height: 300,
+                child: ListView.builder(
+            // shrinkWrap: true,
+            // physics: ClampingScrollPhysics(),
+            itemCount: tablist.length,
+            itemBuilder: (c, index) {
+                return ListTile(
+                  onTap: () {
+                    tabController.animateTo(index);
+                    Navigator.of(context).pop();
+                  },
+                  leading: Icon(IconData(int.parse(tablist[index].iconCode),
+                      fontFamily: tablist[index].iconFontFamily)),
+                  title: Text(tablist[index].title),
+                );
+            }),
+              ),
+              ]
+              
+    ));
+  }
 
-                       List<Offeritem> offerItems;
-                      return StreamBuilder(
-                        stream: FirebaseDatabase.instance.reference("Offers")
-                        .once().asStream(),
+  @override
+  void dispose() {
+    super.dispose();
+    lengthcontroller.sink.close();
+    tabController.dispose();
+  }
 
-                        builder: (c,snapshot){
+  void setTabController() {
+    int test;
+    FirebaseDatabase.instance
+        .reference()
+        .child("Tabs")
+        .child("length")
+        .once()
+        .then((value) {
+      test = value.value;
+      lengthcontroller.sink.add(test);
+    });
+  }
 
+  Widget buildOfferPage() {
+    var offerItems = List<Offeritem>();
+    return StreamBuilder(
+      stream: FirebaseDatabase.instance
+          .reference()
+          .child("Offers")
+          .once()
+          .asStream(),
+      builder: (c, snapshot) {
+        if (snapshot.hasData) {
+          Map<dynamic, dynamic> map = snapshot.data.value;
 
-                            if(snapshot.hasData){
+          map.forEach((key, value) {
+            offerItems.add(Offeritem(
+                title: value['title'],
+                description: value['description'],
+                image: value['image'],
+                dateTime: DateTime.now(),
+                link: value['link']));
+          });
 
+          return Container(
+            child: ListView.builder(
+                shrinkWrap: true,
+                physics: ClampingScrollPhysics(),
+                itemBuilder: (c, index) {
+                  return Offeritem(
+                      title: offerItems[index].title,
+                      link: offerItems[index].link,
+                      image: offerItems[index].image,
+                      description: offerItems[index].description,
+                      dateTime: offerItems[index].dateTime);
+                },
+                itemCount: offerItems.length),
+          );
+        } else {
+          return Center(child: Text("Error occurred"));
+        }
+      },
+    );
+  }
 
-                             Map<dynamic,dynamic> map = snapshot.data.value;
-
-
-                             map.forEach((key, value) {
-
-                                offerItems.add(
-                                  Offeritem(
-                                    title: value['title'],
-                                    description: value['description'],
-                                    image: value['image'],
-                                    dateTime: DateTime.now(),
-                                    link:value['link']
-                                  )
-                                );
-
-
-                              });  
-
-
-
-
-
-
-
-                            }
-
-
-
-
-
-
-                        },
-
-
-                      )
-
-
-
-                  }
-
-  // void setData(int data) async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-
-  //   await prefs.setInt("length", data);
-  // }
-
-  // Future<int> getData() async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-
-  //   return prefs.getInt("length");
-  // }
 }

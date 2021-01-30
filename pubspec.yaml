@@ -36,6 +36,7 @@ dev_dependencies:
     sdk: flutter
   cloud_firestore: ^0.16.0
   connectivity: ^2.0.2
+  page_transition: ^1.1.7+6
   provider: ^4.3.3
   webview_flutter: ^1.0.7
 
